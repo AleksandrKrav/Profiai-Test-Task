@@ -1,0 +1,2 @@
+-- create database
+CREATE DATABASE IF NOT EXISTS app CHARACTER SET UTF8mb4 COLLATE utf8mb4_bin;
