@@ -1,0 +1,38 @@
+version: '2.2'
+
+services:
+  mariadb_server:
+    restart: always
+    image: mariadb
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: app
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root
+    command: --init-file /docker-entrypoint-initdb.d/setup.sql
+    volumes:
+      - .docker/setup.sql:/docker-entrypoint-initdb.d/setup.sql
+      - api_db_data:/var/lib/mysqldo
+    ports:
+      - 3306:3306
+
+  api_server:
+    environment:
+      API_MYSQL_HOST: mariadb_server
+      API_MYSQL_DBNAME: app
+      API_MYSQL_USER: root
+      API_MYSQL_PASSWORD: root
+      API_MYSQL_PORT: 3306
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    volumes:
+      - './:/app'
+    ports:
+      - 8000:8000
+    depends_on:
+      - mariadb_server
+    command: /bin/bash -c "chmod +x init.sh; ./init.sh"
+
+volumes:
+  api_db_data:
